@@ -188,33 +188,40 @@
                 <span id="toggleIcon" class="fs-5">☰</span>
             </button>
             
-            <a class="navbar-brand d-flex align-items-center mb-0 text-decoration-none" href="#">
-                <span class="fs-3 me-2">🥮</span> 
+            <a class="navbar-brand d-flex align-items-center mb-0 text-decoration-none" href="{{ route('dashboard') }}">
+                <span class="fs-3 me-2">🏛️</span> 
                 <div>
-                    <div class="gov-brand-title">EXPENSE TRACKER</div>
+                    <div class="gov-brand-title">BUREAU OF THE TREASURY</div>
                     <small class="text-white-50 fw-normal" style="font-size: 0.65rem;">Integrated Expense & Disbursement Ledger</small>
                 </div>
             </a>
         </div>
 
-        <!-- Middle: Header Navigation Options (Identical to Sidebar) -->
-        <!-- TIP: To experiment with a Sidebar-Only layout, you can comment out this <div> block -->
+        <!-- Middle: Header Navigation Options -->
         <div class="d-none d-lg-flex align-items-center gap-1">
             <a href="{{ route('dashboard') }}" class="header-nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">📊 Dashboard</a>
             <a href="{{ route('expenses.index') }}" class="header-nav-link {{ request()->routeIs('expenses.*') ? 'active' : '' }}">💳 Expenses</a>
             <a href="{{ route('categories.index') }}" class="header-nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">📁 Categories</a>
-            <a href="#" class="header-nav-link">⚙️ Settings</a>
-            <a href="#" class="header-nav-link text-warning fw-bold">🚪 Logout</a>
+            <a href="{{ route('users.index') }}" class="header-nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">👥 Personnel</a>
+            
+            @if(Session::has('user_id'))
+                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="header-nav-link text-warning fw-bold bg-transparent border-0">🚪 Logout ({{ Session::get('user_name') }})</button>
+                </form>
+            @else
+                <a href="{{ route('login') }}" class="header-nav-link text-warning fw-bold">🔐 Sign In</a>
+            @endif
         </div>
 
-        <!-- Right: Security Badge & Authorized User Avatar -->
+        <!-- Right: Security Badge & User Avatar -->
         <div class="text-white d-flex align-items-center">
             <div class="me-3 text-end d-none d-md-block">
                 <span class="badge bg-success bg-opacity-25 text-success border border-success px-2 py-1" style="font-size: 0.65rem;">● GOV-SECURE</span>
                 <small class="d-block text-white-50 mt-1" style="font-size: 0.68rem;">PHP (₱) Currency</small>
             </div>
             <div class="bg-light text-danger rounded-circle fw-bold d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; font-size: 0.8rem;" title="Authorized Signatory">
-                SEC
+                {{ Session::has('user_name') ? strtoupper(substr(Session::get('user_name'), 0, 3)) : 'SEC' }}
             </div>
         </div>
     </nav>
@@ -222,8 +229,6 @@
 
     <!-- ================================================================= -->
     <!-- 3. FORMAL GOVERNMENT SIDEBAR NAVIGATION                           -->
-    <!-- TIP: To experiment with a Header-Only layout, you can wrap this  -->
-    <!-- whole <div class="sidebar">...</div> in HTML comments.             -->
     <!-- ================================================================= -->
     <div class="sidebar" id="appSidebar">
         <div class="pt-2 pb-4">
@@ -232,7 +237,6 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                    
                         <span class="nav-icon">📊</span>
                         <span class="nav-text">Dashboard</span>
                     </a>
@@ -249,24 +253,42 @@
                         <span class="nav-text">Categories</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}" href="{{ route('users.index') }}">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-text">Personnel Directory</span>
+                    </a>
+                </li>
             </ul>
 
             <hr class="mx-3 my-3 text-muted opacity-25">
 
-            <div class="sidebar-section-title">Account Settings</div>
+            <div class="sidebar-section-title">Account Access</div>
             <ul class="nav flex-column mb-4">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <span class="nav-icon">⚙️</span>
-                        <span class="nav-text">Settings</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="#">
-                        <span class="nav-icon">🚪</span>
-                        <span class="nav-text">Logout</span>
-                    </a>
-                </li>
+                @if(Session::has('user_id'))
+                    <li class="nav-item">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="nav-link text-danger w-100 bg-transparent border-0 text-start">
+                                <span class="nav-icon">🚪</span>
+                                <span class="nav-text">Logout ({{ Session::get('user_name') }})</span>
+                            </button>
+                        </form>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link text-success fw-semibold" href="{{ route('login') }}">
+                            <span class="nav-icon">🔐</span>
+                            <span class="nav-text">Sign In</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-primary fw-semibold" href="{{ route('register') }}">
+                            <span class="nav-icon">📝</span>
+                            <span class="nav-text">Register Portal</span>
+                        </a>
+                    </li>
+                @endif
             </ul>
 
         </div>
